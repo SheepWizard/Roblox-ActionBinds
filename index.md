@@ -210,7 +210,7 @@ The keycode given for event run by this function will be Enum.KeyCode.Unknown
 ```lua
 ActionBinds.runActionEvents(actionName: string, eventType: number)
 ```
-| Parameter        | Description           | 
+| Parameter | Description    
 | ------------- |:-------------:|
 | actionName     | Name of the action |
 | eventType    | Either 0 or 1. 0 for key released events, 1 for key pressed events     |
@@ -244,8 +244,6 @@ type Action = {
 	keyPressedEvents: {[number]: (Enum.KeyCode?) -> any?},
 	keyReleasedEvents: {[number]: (Enum.KeyCode?) -> any?},
 }
-
-local actionsList: {[number]: Action} = {}
 
 ```
 
