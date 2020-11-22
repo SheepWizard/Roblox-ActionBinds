@@ -1,6 +1,6 @@
 # Roblox ActionBinds
 
-Roblox ActionBinds is a module that will allow you to create actions that can be controlled my key presses other means.
+Roblox ActionBinds is a module that will allow you to create actions that can be controlled my key presses and other means.
 ## Installation
 
 Copy the contents of [ActionBinds.lua](https://raw.githubusercontent.com/SheepWizard/Roblox-ActionBinds/master/ActionBinds.lua) into a module in StarterPlayerScripts. 
