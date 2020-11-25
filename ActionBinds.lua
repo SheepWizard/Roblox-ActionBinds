@@ -218,11 +218,13 @@ function ActionBinds.runActionEvents(actionName: string, eventType: number)
 	local action: Action = getActionFromName(actionName)
 	if type(action) ~= "nil" then
 		if eventType == 0 then
+		    action.active = false
 			for x = 1, #action.keyReleasedEvents do
 				action.keyReleasedEvents[x](Enum.KeyCode.Unknown)
 			end
 			return
 		elseif eventType == 1 then
+		    action.active = true
 			for x = 1, #action.keyPressedEvents do
 				action.keyPressedEvents[x](Enum.KeyCode.Unknown)
 			end
