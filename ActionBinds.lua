@@ -98,6 +98,9 @@ local function setActionDisable(actionName: string, bool: boolean)
 	local action: Action = getActionFromName(actionName)
 	if type(action) ~= "nil" then
 		action.disabled = bool
+		if bool == true then
+			action.active = false
+		end
 	else
 		warn("Action not found " .. actionName .. ".")
 	end
