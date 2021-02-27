@@ -12,7 +12,7 @@ button.Size = UDim2.new(0,100,0,100)
 wait(0.5)
 local ActionBinds = require(script.Parent.ActionBinds)
 
-ActionBinds.newAction("reload", {Enum.KeyCode.R})
+ActionBinds.newAction("reload", {Enum.KeyCode.R, Enum.UserInputType.MouseButton2})
 -- Events will activate when keys left or right shift are pressed, as well as the input not being gameprocessed
 ActionBinds.newAction("sprint", {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift}, false)
 -- Events will activate when key enter is pressed and input has been gameprocessed

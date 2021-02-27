@@ -2,7 +2,7 @@
 -- Created by Sheep Wizard / paap15
 local UserInputService = game:GetService("UserInputService")
 
-export type KeyList = {[number]: Enum.KeyCode}
+export type KeyList = {[number]: Enum.KeyCode | Enum.UserInputType}
 
 export type Action = {
 	name: string,
@@ -33,6 +33,17 @@ function ActionBinds.newAction(name: string, keys: KeyList, gameProcessed: boole
 			warn("You already have a action with the name " .. name .. ".")
 		end
 	end
+
+	for i = 1, #keys do
+		if keys[i] == Enum.UserInputType.MouseButton1 then
+			keys[i] = Enum.KeyCode.World1
+		elseif keys[i] == Enum.UserInputType.MouseButton2 then
+			keys[i] = Enum.KeyCode.World2
+		elseif keys[i] == Enum.UserInputType.MouseButton3 then
+			keys[i] = Enum.KeyCode.World3
+		end
+	end
+
 	actionsList[#actionsList+1] = {
 		name = name,
 		keys = keys,
@@ -244,10 +255,24 @@ function ActionBinds.runActionEvents(actionName: string, eventType: number)
 end
 
 local function inputBegan(input, gameProcessedEvent)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		input.KeyCode = Enum.KeyCode.World1
+	elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+		input.KeyCode = Enum.KeyCode.World2
+	elseif input.UserInputType == Enum.UserInputType.MouseButton3 then
+		input.KeyCode = Enum.KeyCode.World3
+	end
 	checkEvents(input.KeyCode, gameProcessedEvent, "keyPressedEvents", true, true)
 end
 
 local function inputEnded(input, gameProcessedEvent)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		input.KeyCode = Enum.KeyCode.World1
+	elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+		input.KeyCode = Enum.KeyCode.World2
+	elseif input.UserInputType == Enum.UserInputType.MouseButton3 then
+		input.KeyCode = Enum.KeyCode.World3
+	end
 	checkEvents(input.KeyCode, gameProcessedEvent, "keyReleasedEvents", false, true)
 end
 
