@@ -42,7 +42,7 @@ ActionBinds.newAction(name: string, keys: KeyList, gameProcessed: boolean?): Act
 | Parameter        | Description           | 
 | ------------- |:-------------:|
 | name     | Name of the action |
-| keys    | List of key code enums which will trigger action events. There is no limit on how many keycodes you can use      |
+| keys    | List of key code enums which will trigger action events. There is no limit on how many keycodes you can use. You can also user Enum.UserInputType.MouseButton1, MouseButton2, MouseButton3, to detect mouse clicks    |
 | gameProcessed | If action events should trigger if gameProcessed is true or false (optional)      |
 
 Example:
@@ -245,7 +245,7 @@ end
 
 ## Types
 ```lua
-type KeyList = {[number]: Enum.KeyCode}
+type KeyList = {Enum.KeyCode | Enum.UserInputType}
 
 type Action = {
 	name: string,
@@ -254,8 +254,8 @@ type Action = {
 	ingoreGameProcessed: boolean?,
 	disabled: boolean,
 	active: boolean,
-	keyPressedEvents: {[number]: (Enum.KeyCode?) -> any?},
-	keyReleasedEvents: {[number]: (Enum.KeyCode?) -> any?},
+	keyPressedEvents: {(Enum.KeyCode?) -> nil},
+	keyReleasedEvents: {(Enum.KeyCode?) -> nil},
 }
 
 ```
