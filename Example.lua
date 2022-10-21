@@ -9,14 +9,17 @@ local button = Instance.new("TextButton")
 button.Parent = screenGUI
 button.Size = UDim2.new(0,100,0,100)
 
-wait(0.5)
-local ActionBinds = require(script.Parent.ActionBinds)
+local ActionBinds = require(script.Parent:WaitForChild("ActionBinds"))
 
-ActionBinds.newAction("reload", {Enum.KeyCode.R, Enum.UserInputType.MouseButton2})
+ActionBinds.newAction("reload", {Enum.KeyCode.R})
+
 -- Events will activate when keys left or right shift are pressed, as well as the input not being gameprocessed
 ActionBinds.newAction("sprint", {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift}, false)
+
 -- Events will activate when key enter is pressed and input has been gameprocessed
 ActionBinds.newAction("sendMessage", {Enum.KeyCode.KeypadEnter}, true)
+
+ActionBinds.newAction("mouse1", {Enum.UserInputType.MouseButton1}, false)
 
 
 -- This event will run when a reload key has been pressed
@@ -34,6 +37,10 @@ end)
 ActionBinds.OnActionKeyReleased("sprint", function(keycode)
 	print("Stop sprinting.")
 	ActionBinds.enable("reload") -- Enable reload action
+end)
+
+ActionBinds.OnActionKeyPressed("mouse1", function(keycode)
+	print("Mouse 1 pressed")
 end)
 
 print(ActionBinds.isDisabled("sprint")) -- Check if a action has been disabled
@@ -54,10 +61,10 @@ ActionBinds.GUIButton("reload", button)
 
 -- This code will simulate the sprint action keys being pressed then released 5 seconds later
 ActionBinds.runActionEvents("sprint", 1)
-wait(5)
+task.wait(5)
 ActionBinds.runActionEvents("sprint", 0)
 
 -- List of all action names
-for k, v in pairs(ActionBinds.actionNames) do
+for k, v in ActionBinds.actionNames do
 	print(v)
 end
