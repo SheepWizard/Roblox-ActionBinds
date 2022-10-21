@@ -2,7 +2,7 @@
 -- Created by Sheep Wizard / paap15
 local UserInputService = game:GetService("UserInputService")
 
-export type KeyList = {[number]: Enum.KeyCode | Enum.UserInputType}
+export type KeyList = {Enum.KeyCode | Enum.UserInputType}
 
 export type Action = {
 	name: string,
@@ -11,11 +11,11 @@ export type Action = {
 	ingoreGameProcessed: boolean?,
 	disabled: boolean,
 	active: boolean,
-	keyPressedEvents: {[number]: (Enum.KeyCode?) -> any?},
-	keyReleasedEvents: {[number]: (Enum.KeyCode?) -> any?},
+	keyPressedEvents: {(Enum.KeyCode?) -> any?},
+	keyReleasedEvents: {(Enum.KeyCode?) -> any?},
 }
 
-local actionsList: {[number]: Action} = {}
+local actionsList: {Action} = {}
 
 local ActionBinds = {}
 
@@ -58,22 +58,22 @@ function ActionBinds.newAction(name: string, keys: KeyList, gameProcessed: boole
 	return actionsList[#actionsList]
 end
 
-local function getActionFromName(actionName: string): Action
+local function getActionFromName(actionName: string): Action?
 	for i = 1, #actionsList do
 		if actionsList[i].name == actionName then
 			return actionsList[i]
 		end
 	end
-	return nil
+	return
 end
 
 -- Run a function when a key assigned to a action is pressed
 -- actionName: Name of the action you want this to apply too
 -- event: Function that will run. The keycode enum that is pressed will passed as a function paramater.
 -- if event is called from different source (e.g. gui) then the keycode will be Enum.KeyCode.Unknown
-function ActionBinds.OnActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> any?)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+function ActionBinds.OnActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> nil)
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		action.keyPressedEvents[#action.keyPressedEvents+1] = event
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -84,9 +84,9 @@ end
 -- actionName: Name of the action you want this to apply too
 -- event: Function that will run. The keycode enum that is released will passed as a function paramater.
 -- if event is called from different source (e.g. gui) then the keycode will be Enum.KeyCode.Unknown
-function ActionBinds.OnActionKeyReleased(actionName: string, event: (Enum.KeyCode?) ->any?)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+function ActionBinds.OnActionKeyReleased(actionName: string, event: (Enum.KeyCode?) -> nil)
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		action.keyReleasedEvents[#action.keyReleasedEvents+1] = event
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -96,18 +96,17 @@ end
 -- Returns true if the action is active. It will be active if the key pressed event runs
 -- actionName: Name of the action
 function ActionBinds.isActive(actionName: string): boolean
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		return action.active
-	else
-		warn("Action not found " .. actionName .. ".")
-		return false
 	end
+	warn("Action not found " .. actionName .. ".")
+	return false
 end
 
 local function setActionDisable(actionName: string, bool: boolean)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		action.disabled = bool
 		if bool == true then
 			action.active = false
@@ -132,21 +131,20 @@ end
 -- Returns if the action is diabled or not
 -- actionName: Name of the action
 function ActionBinds.isDisabled(actionName: string): boolean
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		return action.disabled
-	else
-		warn("Action not found " .. actionName .. ".")
-		return false
 	end
+	warn("Action not found " .. actionName .. ".")
+	return false
 end
 
 -- Set a action to ignore gameprocessed rules. If set to true event will run if the key has or hasnt been gameprocessed
 -- actionName: Name of the action
 -- bool: true or false
 function ActionBinds.ignoreGameProcessed(actionName: string, bool: boolean)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		action.ingoreGameProcessed = bool
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -156,20 +154,19 @@ end
 -- Returns keys assigned to a action
 -- actionName: Name of the action
 function ActionBinds.getKeys(actionName: string): KeyList
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		return action.keys
-	else
-		warn("Action not found " .. actionName .. ".")
-		return {}
 	end
+	warn("Action not found " .. actionName .. ".")
+	return {}
 end
 
 -- Give a new list of keys that will activate the actions events, replacing the old ones
 -- actionName: Name of the action
 function ActionBinds.changeKeys(actionName: string, keys: KeyList)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		action.keys = keys
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -178,14 +175,13 @@ end
 
 -- Returns the action object
 -- actionName: Name of the action
-function ActionBinds.getActionObject(actionName: string): Action
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+function ActionBinds.getActionObject(actionName: string): Action?
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		return action
-	else
-		warn("Action not found " .. actionName .. ".")
-		return nil
 	end
+	warn("Action not found " .. actionName .. ".")
+	return
 end
 
 local function checkEvents(input, gameProcessedEvent: boolean, eventType: string, activeStatus: boolean, updateActive: boolean)
@@ -208,8 +204,8 @@ end
 -- actionName: Name of the action
 -- button: GUI button
 function ActionBinds.GUIButton(actionName: string, button: GuiButton)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		button.Activated:Connect(function()
 			if action.disabled then return end
 			for x = 1, #action.keyPressedEvents do
@@ -230,8 +226,8 @@ end
 -- actionName: Name of the action
 -- eventType: 0 for key released, 1 for key pressed
 function ActionBinds.runActionEvents(actionName: string, eventType: number)
-	local action: Action = getActionFromName(actionName)
-	if type(action) ~= "nil" then
+	local action = getActionFromName(actionName)
+	if action ~= nil then
 		if action.disabled then return end
 		if eventType == 0 then
 			action.active = false
