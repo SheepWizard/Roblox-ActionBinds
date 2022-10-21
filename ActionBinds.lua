@@ -11,8 +11,8 @@ export type Action = {
 	ingoreGameProcessed: boolean?,
 	disabled: boolean,
 	active: boolean,
-	keyPressedEvents: {(Enum.KeyCode?) -> any?},
-	keyReleasedEvents: {(Enum.KeyCode?) -> any?},
+	keyPressedEvents: {(Enum.KeyCode?) -> nil},
+	keyReleasedEvents: {(Enum.KeyCode?) -> nil},
 }
 
 local actionsList: {Action} = {}
