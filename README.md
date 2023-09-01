@@ -16,16 +16,16 @@ ActionBinds.newAction("sprint", {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift
 ActionBinds.newAction("reload", {Enum.KeyCode.R}, false)
 
 -- When 'R' is pressed this event will run.
-ActionBinds.OnActionKeyPressed("reload", function(keycode)
+ActionBinds.onActionKeyPressed("reload", function(keycode)
 	print("Reload button pressed with key " .. tostring(keycode))
 end)
 -- When left or right shift is pressed this event will run, disabling the reload event.
-ActionBinds.OnActionKeyPressed("sprint", function(keycode)
+ActionBinds.onActionKeyPressed("sprint", function(keycode)
 	print("Start sprinting.")
 	ActionBinds.disable("reload") -- Disable reload action
 end)	
 -- When left or right shift is released this even will run, enabling the reload event
-ActionBinds.OnActionKeyReleased("sprint", function(keycode)
+ActionBinds.onActionKeyReleased("sprint", function(keycode)
 	print("Stop sprinting.")
 	ActionBinds.enable("reload") -- Enable reload action
 end)
@@ -42,18 +42,18 @@ ActionBinds.newAction(name: string, keys: KeyList, gameProcessed: boolean?): Act
 | Parameter        | Description           | 
 | ------------- |:-------------:|
 | name     | Name of the action |
-| keys    | List of key code enums which will trigger action events. There is no limit on how many keycodes you can use. You can also user Enum.UserInputType.MouseButton1, MouseButton2, MouseButton3, to detect mouse clicks    |
+| keys    | List of key code enums which will trigger action events. There is no limit on how many keycodes you can use. You can also use string "MouseButton1", "MouseButton2", "MouseButton3", to detect mouse clicks    |
 | gameProcessed | If action events should trigger if gameProcessed is true or false (optional)      |
 
 Example:
 ```lua
-ActionBinds.newAction("sprint", {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift}, false)
+ActionBinds.newAction("sprint", {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, "MouseButton1"}, false)
 ```
 
-### ActionBinds.OnActionKeyPressed
+### ActionBinds.onActionKeyPressed
 Add a key pressed event to the action. When one of the actions keys is pressed this event will run.
 ```lua
-ActionBinds.OnActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> any?)
+ActionBinds.onActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> any?)
 ```
 | Parameter        | Description           | 
 | ------------- |:-------------:|
@@ -62,15 +62,15 @@ ActionBinds.OnActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> any
 
 Example:
 ```lua
-ActionBinds.OnActionKeyPressed("sprint", function(keycode)
+ActionBinds.onActionKeyPressed("sprint", function(keycode)
 	print("Start sprinting.")
 end)
 ```
 
-### ActionBinds.OnActionKeyReleased
+### ActionBinds.onActionKeyReleased
 Add a key released event to the action. When one of the actions keys is released this event will run.
 ```lua
-ActionBinds.OnActionKeyReleased(actionName: string, event: (Enum.KeyCode?) ->any?)
+ActionBinds.onActionKeyReleased(actionName: string, event: (Enum.KeyCode?) ->any?)
 ```
 | Parameter        | Description           | 
 | ------------- |:-------------:|
@@ -79,13 +79,13 @@ ActionBinds.OnActionKeyReleased(actionName: string, event: (Enum.KeyCode?) ->any
 
 Example:
 ```lua
-ActionBinds.OnActionKeyReleased("sprint", function(keycode)
+ActionBinds.onActionKeyReleased("sprint", function(keycode)
 	ActionBinds.enable("reload")
 end)
 ```
 
 ### ActionBinds.isActive
-Returns true or false if the action is currently active. A action will be active if one of its key is pressed.
+Returns true or false if the action is currently active. A action will be active if one of its keys is pressed.
 ```lua
 ActionBinds.isActive(actionName: string): boolean
 ```
@@ -245,7 +245,7 @@ end
 
 ## Types
 ```lua
-type KeyList = {Enum.KeyCode | Enum.UserInputType}
+type KeyList = {Enum.KeyCode | "MouseButton1" | "MouseButton2" | "MouseButton3"}
 
 type Action = {
 	name: string,

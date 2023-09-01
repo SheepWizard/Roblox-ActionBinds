@@ -23,23 +23,23 @@ ActionBinds.newAction("mouse1", {Enum.UserInputType.MouseButton1}, false)
 
 
 -- This event will run when a reload key has been pressed
-ActionBinds.OnActionKeyPressed("reload", function(keycode)
+ActionBinds.onActionKeyPressed("reload", function(keycode)
 	print("Reload button pressed with key " .. tostring(keycode))
 	print(ActionBinds.isActive("sprint")) -- Check if player is sprinting
 end)
 
-ActionBinds.OnActionKeyPressed("sprint", function(keycode)
+ActionBinds.onActionKeyPressed("sprint", function(keycode)
 	print("Start sprinting.")
 	ActionBinds.disable("reload") -- Disable reload action
 end)
 
 -- This event will run when a sprint key has been released
-ActionBinds.OnActionKeyReleased("sprint", function(keycode)
+ActionBinds.onActionKeyReleased("sprint", function(keycode)
 	print("Stop sprinting.")
 	ActionBinds.enable("reload") -- Enable reload action
 end)
 
-ActionBinds.OnActionKeyPressed("mouse1", function(keycode)
+ActionBinds.onActionKeyPressed("mouse1", function(keycode)
 	print("Mouse 1 pressed")
 end)
 

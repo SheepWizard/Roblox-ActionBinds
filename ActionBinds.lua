@@ -2,7 +2,9 @@
 -- Created by Sheep Wizard / paap15
 local UserInputService = game:GetService("UserInputService")
 
-export type KeyList = {Enum.KeyCode | Enum.UserInputType}
+export type KeyList = {Enum.KeyCode | "MouseButton1" | "MouseButton2" | "MouseButton3"}
+
+export type EventType = "keyPressedEvents" | "keyReleasedEvents"
 
 export type Action = {
 	name: string,
@@ -11,8 +13,8 @@ export type Action = {
 	ingoreGameProcessed: boolean?,
 	disabled: boolean,
 	active: boolean,
-	keyPressedEvents: {(Enum.KeyCode?) -> nil},
-	keyReleasedEvents: {(Enum.KeyCode?) -> nil},
+	keyPressedEvents: {(Enum.KeyCode?) -> nil?},
+	keyReleasedEvents: {(Enum.KeyCode?) -> nil?},
 }
 
 local actionsList: {Action} = {}
@@ -28,23 +30,14 @@ ActionBinds.actionNames = {}
 -- gameProcessed: If you want the action to run if the game has processed the input or not. If not specified default is false
 -- Returns a Action object
 function ActionBinds.newAction(name: string, keys: KeyList, gameProcessed: boolean?): Action
-	for i = 1, #actionsList do
-		if actionsList[i].name == name then
+
+	for _, action in actionsList do
+		if action.name == name then
 			warn("You already have a action with the name " .. name .. ".")
 		end
 	end
 
-	for i = 1, #keys do
-		if keys[i] == Enum.UserInputType.MouseButton1 then
-			keys[i] = Enum.KeyCode.World1
-		elseif keys[i] == Enum.UserInputType.MouseButton2 then
-			keys[i] = Enum.KeyCode.World2
-		elseif keys[i] == Enum.UserInputType.MouseButton3 then
-			keys[i] = Enum.KeyCode.World3
-		end
-	end
-
-	actionsList[#actionsList+1] = {
+	table.insert(actionsList, {
 		name = name,
 		keys = keys,
 		gameProcessed = gameProcessed or false,
@@ -52,16 +45,17 @@ function ActionBinds.newAction(name: string, keys: KeyList, gameProcessed: boole
 		disabled = false,
 		active = false,
 		keyPressedEvents = {},
-		keyReleasedEvents = {}
-	}
+		keyReleasedEvents = {}		
+	})
+
 	ActionBinds.actionNames[name] = name
 	return actionsList[#actionsList]
 end
 
 local function getActionFromName(actionName: string): Action?
-	for i = 1, #actionsList do
-		if actionsList[i].name == actionName then
-			return actionsList[i]
+	for _, action in actionsList do
+		if action.name == actionName then
+			return action
 		end
 	end
 	return
@@ -71,9 +65,9 @@ end
 -- actionName: Name of the action you want this to apply too
 -- event: Function that will run. The keycode enum that is pressed will passed as a function paramater.
 -- if event is called from different source (e.g. gui) then the keycode will be Enum.KeyCode.Unknown
-function ActionBinds.OnActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> nil)
+function ActionBinds.onActionKeyPressed(actionName: string, event: (Enum.KeyCode?) -> any?)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		action.keyPressedEvents[#action.keyPressedEvents+1] = event
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -84,9 +78,9 @@ end
 -- actionName: Name of the action you want this to apply too
 -- event: Function that will run. The keycode enum that is released will passed as a function paramater.
 -- if event is called from different source (e.g. gui) then the keycode will be Enum.KeyCode.Unknown
-function ActionBinds.OnActionKeyReleased(actionName: string, event: (Enum.KeyCode?) -> nil)
+function ActionBinds.onActionKeyReleased(actionName: string, event: (Enum.KeyCode?) ->any?)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		action.keyReleasedEvents[#action.keyReleasedEvents+1] = event
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -97,16 +91,17 @@ end
 -- actionName: Name of the action
 function ActionBinds.isActive(actionName: string): boolean
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		return action.active
+	else
+		warn("Action not found " .. actionName .. ".")
+		return false
 	end
-	warn("Action not found " .. actionName .. ".")
-	return false
 end
 
 local function setActionDisable(actionName: string, bool: boolean)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		action.disabled = bool
 		if bool == true then
 			action.active = false
@@ -131,12 +126,13 @@ end
 -- Returns if the action is diabled or not
 -- actionName: Name of the action
 function ActionBinds.isDisabled(actionName: string): boolean
-	local action = getActionFromName(actionName)
-	if action ~= nil then
+	local action: Action? = getActionFromName(actionName)
+	if action then
 		return action.disabled
+	else
+		warn("Action not found " .. actionName .. ".")
+		return false
 	end
-	warn("Action not found " .. actionName .. ".")
-	return false
 end
 
 -- Set a action to ignore gameprocessed rules. If set to true event will run if the key has or hasnt been gameprocessed
@@ -144,7 +140,7 @@ end
 -- bool: true or false
 function ActionBinds.ignoreGameProcessed(actionName: string, bool: boolean)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		action.ingoreGameProcessed = bool
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -155,18 +151,19 @@ end
 -- actionName: Name of the action
 function ActionBinds.getKeys(actionName: string): KeyList
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		return action.keys
+	else
+		warn("Action not found " .. actionName .. ".")
+		return {}
 	end
-	warn("Action not found " .. actionName .. ".")
-	return {}
 end
 
 -- Give a new list of keys that will activate the actions events, replacing the old ones
 -- actionName: Name of the action
 function ActionBinds.changeKeys(actionName: string, keys: KeyList)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		action.keys = keys
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -177,23 +174,25 @@ end
 -- actionName: Name of the action
 function ActionBinds.getActionObject(actionName: string): Action?
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		return action
+	else
+		warn("Action not found " .. actionName .. ".")
+		return
 	end
-	warn("Action not found " .. actionName .. ".")
-	return
 end
 
-local function checkEvents(input, gameProcessedEvent: boolean, eventType: string, activeStatus: boolean, updateActive: boolean)
-	for i = 1, #actionsList do
-		for z = 1, #actionsList[i].keys do
-			if actionsList[i].keys[z] == input then
-				if not actionsList[i].disabled and ((actionsList[i].gameProcessed == gameProcessedEvent) or actionsList[i].ingoreGameProcessed) then
-					actionsList[i].active = activeStatus
-					for x = 1, #actionsList[i][eventType] do
-						actionsList[i][eventType][x](input)
-					end
-				end
+local function checkEvents(input, gameProcessedEvent: boolean, eventType: EventType, activeStatus: boolean)
+	
+	for _, action in actionsList do
+		if action.disabled then continue end
+		if action.gameProcessed ~= gameProcessedEvent and not action.ingoreGameProcessed then return end
+	
+		for _, key in action.keys do
+			if key ~= input then continue end
+			action.active = activeStatus
+			for _, event in action[eventType] do
+				event(input)
 			end
 		end
 	end
@@ -205,15 +204,18 @@ end
 -- button: GUI button
 function ActionBinds.GUIButton(actionName: string, button: GuiButton)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		button.Activated:Connect(function()
 			if action.disabled then return end
-			for x = 1, #action.keyPressedEvents do
-				action.keyPressedEvents[x](Enum.KeyCode.Unknown)
+
+			for _, keyPressedEvent in action.keyPressedEvents do
+				keyPressedEvent(Enum.KeyCode.Unknown)
 			end
-			for x = 1, #action.keyReleasedEvents do
-				action.keyReleasedEvents[x](Enum.KeyCode.Unknown)
+
+			for _, keyReleasedEvent in action.keyReleasedEvents do
+				keyReleasedEvent(Enum.KeyCode.Unknown)
 			end
+
 		end)
 	else
 		warn("Action not found " .. actionName .. ".")
@@ -225,20 +227,20 @@ end
 -- The keycode given for event run by this function will be Enum.KeyCode.Unknown
 -- actionName: Name of the action
 -- eventType: 0 for key released, 1 for key pressed
-function ActionBinds.runActionEvents(actionName: string, eventType: number)
+function ActionBinds.runActionEvents(actionName: string, eventType: EventType)
 	local action = getActionFromName(actionName)
-	if action ~= nil then
+	if action then
 		if action.disabled then return end
-		if eventType == 0 then
+		if eventType == "keyReleasedEvents" then
 			action.active = false
-			for x = 1, #action.keyReleasedEvents do
-				action.keyReleasedEvents[x](Enum.KeyCode.Unknown)
-			end
+			for _, keyReleasedEvent in action.keyReleasedEvents do
+				keyReleasedEvent(Enum.KeyCode.Unknown)
+			end	
 			return
-		elseif eventType == 1 then
+		elseif eventType == "keyPressedEvents" then
 			action.active = true
-			for x = 1, #action.keyPressedEvents do
-				action.keyPressedEvents[x](Enum.KeyCode.Unknown)
+			for _, keyPressedEvent in action.keyPressedEvents do
+				keyPressedEvent(Enum.KeyCode.Unknown)
 			end
 			return
 		else
@@ -251,25 +253,29 @@ function ActionBinds.runActionEvents(actionName: string, eventType: number)
 end
 
 local function inputBegan(input, gameProcessedEvent)
+	local keyCode = input.KeyCode
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		input.KeyCode = Enum.KeyCode.World1
+		keyCode = "MouseButton1"
 	elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-		input.KeyCode = Enum.KeyCode.World2
+		keyCode = "MouseButton2"
 	elseif input.UserInputType == Enum.UserInputType.MouseButton3 then
-		input.KeyCode = Enum.KeyCode.World3
+		keyCode = "MouseButton3"
 	end
-	checkEvents(input.KeyCode, gameProcessedEvent, "keyPressedEvents", true, true)
+
+	checkEvents(keyCode, gameProcessedEvent, "keyPressedEvents", true)
 end
 
 local function inputEnded(input, gameProcessedEvent)
+	local keyCode = input.KeyCode
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		input.KeyCode = Enum.KeyCode.World1
+		keyCode = "MouseButton1"
 	elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-		input.KeyCode = Enum.KeyCode.World2
+		keyCode = "MouseButton2"
 	elseif input.UserInputType == Enum.UserInputType.MouseButton3 then
-		input.KeyCode = Enum.KeyCode.World3
+		keyCode = "MouseButton3"
 	end
-	checkEvents(input.KeyCode, gameProcessedEvent, "keyReleasedEvents", false, true)
+	
+	checkEvents(keyCode, gameProcessedEvent, "keyReleasedEvents", false)
 end
 
 UserInputService.InputBegan:Connect(inputBegan)
