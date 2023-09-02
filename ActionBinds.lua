@@ -186,7 +186,7 @@ local function checkEvents(input, gameProcessedEvent: boolean, eventType: EventT
 	
 	for _, action in actionsList do
 		if action.disabled then continue end
-		if action.gameProcessed ~= gameProcessedEvent and not action.ingoreGameProcessed then return end
+		if action.gameProcessed ~= gameProcessedEvent and not action.ingoreGameProcessed then continue end
 	
 		for _, key in action.keys do
 			if key ~= input then continue end
